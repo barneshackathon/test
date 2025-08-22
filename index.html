@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>شات — n8n</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="title">مساعد الذكاء الاصطناعي</div>
+      <div class="subtitle">متصل عبر n8n Webhook</div>
+    </header>
+
+    <main id="messages" class="messages" role="log" aria-live="polite">
+      <div class="msg bot">
+        أهلاً! اكتب رسالتك في الأسفل وسأرد عليك فورًا.
+        <span class="time"></span>
+      </div>
+    </main>
+
+    <form id="chat-form" class="inputbar" autocomplete="off">
+      <input id="chat-text" type="text" placeholder="اكتب رسالتك هنا..." />
+      <button id="sendBtn" type="button" class="send" aria-label="إرسال">➤</button>
+    </form>
+
+    <div id="status" class="status" aria-live="polite"></div>
+  </div>
+
+  <!-- إعدادات الاتصال (غيّر القيم بالأسفل) -->
+  <script>
+    window.CHAT_CONFIG = {
+      N8N_WEBHOOK_URL: "https://sultannn.app.n8n.cloud/webhook/33d36dea-a8d9-439c-bbed-dc87c7e45315", // ضع Production URL
+      AUTH_TOKEN: "",        // اختياري: ضع توكن وتحقق منه في n8n
+      TIMEOUT_MS: 15000,     // مهلة الطلب
+      MAX_RETRIES: 2,        // عدد المحاولات
+      SHOW_TYPING: true
+    };
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
