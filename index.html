@@ -1,46 +1,250 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>شات — n8n (query.message)</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شات ويب مع n8n Webhook</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #4a89dc;
+            margin-bottom: 30px;
+        }
+        .webhook-setup {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+        }
+        .webhook-setup label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .webhook-setup input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .chat-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .sent {
+            background-color: #4a89dc;
+            color: white;
+            margin-left: auto;
+            margin-right: 0;
+            text-align: left;
+        }
+        .received {
+            background-color: #e6e6e6;
+            color: #333;
+            margin-right: auto;
+            margin-left: 0;
+        }
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            margin-right: 10px;
+        }
+        .chat-input button {
+            background-color: #4a89dc;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .chat-input button:hover {
+            background-color: #3a70b0;
+        }
+        .status {
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            color: #666;
+        }
+        .success {
+            color: #4caf50;
+        }
+        .error {
+            color: #f44336;
+        }
+    </style>
 </head>
 <body>
-  <div class="wrap">
-    <header class="top">
-      <div class="title">مساعد الذكاء الاصطناعي</div>
-      <div class="subtitle">إرسال الحقل: <code>$json.query.message</code></div>
-    </header>
+    <div class="container">
+        <h1>شات ويب مع دعم n8n Webhook</h1>
+        
+        <div class="webhook-setup">
+            <label for="webhook-url">رابط ويب هوك n8n:</label>
+            <input type="url" id="webhook-url" placeholder="أدخل رابط الhttps://sultannn.app.n8n.cloud/webhook-test/webhooktest">
+        </div>
+        
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <div class="message received">
+                    مرحباً! يمكنك إرسال رسائل وسيتم إرسالها إلى ويب هوك n8n.
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <input type="text" id="message-input" placeholder="اكتب رسالتك هنا...">
+                <button id="send-button">إرسال</button>
+            </div>
+        </div>
+        
+        <div class="status" id="status"></div>
+    </div>
 
-    <main id="messages" class="messages" role="log" aria-live="polite">
-      <div class="msg bot">
-        أهلاً! اكتب رسالتك في الأسفل وسأرد عليك فورًا.
-        <span class="time"></span>
-      </div>
-    </main>
-
-    <form id="chat-form" class="inputbar" autocomplete="off">
-      <input id="chat-text" type="text" placeholder="اكتب رسالتك هنا..." />
-      <button id="sendBtn" type="button" class="send" aria-label="إرسال">➤</button>
-    </form>
-
-    <div id="status" class="status" aria-live="polite"></div>
-  </div>
-
-  <!-- إعدادات الاتصال (غيّر القيم بالأسفل) -->
-  <script>
-    window.CHAT_CONFIG = {
-      N8N_WEBHOOK_URL: "https://YOUR-N8N-DOMAIN/webhook/chat", // Production URL
-      AUTH_TOKEN: "",        // اختياري: Bearer token
-      TIMEOUT_MS: 15000,
-      MAX_RETRIES: 2,
-      SHOW_TYPING: true
-    };
-  </script>
-  <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const webhookUrlInput = document.getElementById('webhook-url');
+            const messageInput = document.getElementById('message-input');
+            const sendButton = document.getElementById('send-button');
+            const chatMessages = document.getElementById('chat-messages');
+            const statusDiv = document.getElementById('status');
+            
+            // تحميل رابط الويب هوك من التخزين المحلي إذا كان موجوداً
+            const savedWebhookUrl = localStorage.getItem('webhookUrl');
+            if (savedWebhookUrl) {
+                webhookUrlInput.value = savedWebhookUrl;
+            }
+            
+            // حفظ رابط الويب هوك عند تغييره
+            webhookUrlInput.addEventListener('change', function() {
+                localStorage.setItem('webhookUrl', webhookUrlInput.value);
+                showStatus('تم حفظ رابط الويب هوك', 'success');
+            });
+            
+            // إرسال الرسالة عند النقر على زر الإرسال
+            sendButton.addEventListener('click', sendMessage);
+            
+            // إرسال الرسالة عند الضغط على Enter
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                const webhookUrl = webhookUrlInput.value.trim();
+                
+                if (!message) {
+                    showStatus('الرجاء إدخال رسالة', 'error');
+                    return;
+                }
+                
+                if (!webhookUrl) {
+                    showStatus('الرجاء إدخال رابط ويب هوك n8n', 'error');
+                    return;
+                }
+                
+                // إضافة الرسالة إلى الشات
+                addMessageToChat(message, 'sent');
+                
+                // إرسال الرسالة إلى ويب هوك n8n
+                sendToWebhook(webhookUrl, message);
+                
+                // مسح حقل الإدخال
+                messageInput.value = '';
+            }
+            
+            function addMessageToChat(message, type) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(type);
+                messageDiv.textContent = message;
+                
+                chatMessages.appendChild(messageDiv);
+                
+                // التمرير إلى الأسفل لعرض الرسالة الجديدة
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            function sendToWebhook(url, message) {
+                // إضافة الرسالة كـ query parameter
+                const fullUrl = `${url}?message=${encodeURIComponent(message)}`;
+                
+                showStatus('جاري الإرسال...', '');
+                
+                fetch(fullUrl, {
+                    method: 'GET'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        showStatus('تم إرسال الرسالة بنجاح إلى n8n', 'success');
+                        // إضافة رسالة وهمية للرد (لأغراض العرض فقط)
+                        setTimeout(() => {
+                            addMessageToChat('تم استلام رسالتك بنجاح في n8n', 'received');
+                        }, 1000);
+                    } else {
+                        throw new Error('فشل في الإرسال');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showStatus('فشل في إرسال الرسالة: ' + error.message, 'error');
+                });
+            }
+            
+            function showStatus(message, type) {
+                statusDiv.textContent = message;
+                statusDiv.className = 'status';
+                if (type) {
+                    statusDiv.classList.add(type);
+                }
+                
+                // إخفاء رسالة الحالة بعد 3 ثواني
+                setTimeout(() => {
+                    statusDiv.textContent = '';
+                    statusDiv.className = 'status';
+                }, 3000);
+            }
+        });
+    </script>
 </body>
 </html>
