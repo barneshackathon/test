@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>شات — n8n</title>
+  <title>شات — n8n (query.message)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
@@ -13,7 +13,7 @@
   <div class="wrap">
     <header class="top">
       <div class="title">مساعد الذكاء الاصطناعي</div>
-      <div class="subtitle">متصل عبر n8n Webhook</div>
+      <div class="subtitle">إرسال الحقل: <code>$json.query.message</code></div>
     </header>
 
     <main id="messages" class="messages" role="log" aria-live="polite">
@@ -34,10 +34,10 @@
   <!-- إعدادات الاتصال (غيّر القيم بالأسفل) -->
   <script>
     window.CHAT_CONFIG = {
-      N8N_WEBHOOK_URL: "https://sultannn.app.n8n.cloud/webhook-test/webhooktest", // ضع Production URL
-      AUTH_TOKEN: "",        // اختياري: ضع توكن وتحقق منه في n8n
-      TIMEOUT_MS: 15000,     // مهلة الطلب
-      MAX_RETRIES: 2,        // عدد المحاولات
+      N8N_WEBHOOK_URL: "https://YOUR-N8N-DOMAIN/webhook/chat", // Production URL
+      AUTH_TOKEN: "",        // اختياري: Bearer token
+      TIMEOUT_MS: 15000,
+      MAX_RETRIES: 2,
       SHOW_TYPING: true
     };
   </script>
