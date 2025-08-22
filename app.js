@@ -1,17 +1,12 @@
 (function(){
   function $id(id){ return document.getElementById(id); }
-  function nowTime(){
-    const d = new Date();
-    return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-  }
+  function nowTime(){ const d = new Date(); return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
   function addMessage(text, who){
     const box = $id('messages');
     const div = document.createElement('div');
     div.className = 'msg ' + (who || 'bot');
     div.innerHTML = String(text || '').replace(/\n/g,'<br>') + '<span class="time">'+ nowTime() +'</span>';
-    box.appendChild(div);
-    box.scrollTop = box.scrollHeight;
-    return div;
+    box.appendChild(div); box.scrollTop = box.scrollHeight; return div;
   }
   function setStatus(t){ $id('status').textContent = t || ''; }
 
@@ -34,7 +29,7 @@
             'Content-Type': 'application/json',
             ...(token ? {'Authorization': 'Bearer ' + token} : {})
           },
-          body: JSON.stringify({ text: userText }) // n8n: {{$json.body.text}}
+          body: JSON.stringify({ query: { message: userText } }) // << هنا التغيير
         });
         clearTimeout(timer);
         if(!resp.ok) throw new Error('HTTP '+resp.status);
@@ -49,37 +44,17 @@
   }
 
   function wire(){
-    const form = $id('chat-form');
-    const input = $id('chat-text');
-    const btn   = $id('sendBtn');
-
+    const form = $id('chat-form'), input = $id('chat-text'), btn = $id('sendBtn');
     async function send(){
-      const text = (input.value||'').trim();
-      if(!text) return;
-      addMessage(text, 'me');
-      input.value = ''; input.focus();
-
-      let loader;
-      if ((window.CHAT_CONFIG||{}).SHOW_TYPING) loader = addMessage('...', 'bot loading');
+      const text = (input.value||'').trim(); if(!text) return;
+      addMessage(text, 'me'); input.value=''; input.focus();
+      let loader; if ((window.CHAT_CONFIG||{}).SHOW_TYPING) loader = addMessage('...', 'bot loading');
       setStatus('جاري الاتصال…');
-
-      try{
-        const reply = await callWebhook(text);
-        if (loader) loader.remove();
-        addMessage(reply, 'bot');
-        setStatus('');
-      }catch(e){
-        if (loader) loader.remove();
-        addMessage('❌ تعذّر الاتصال. تأكد من رابط الويب هوك والصلاحيات.', 'bot');
-        setStatus(String(e.message||e));
-        console.error(e);
-      }
+      try{ const reply = await callWebhook(text); if (loader) loader.remove(); addMessage(reply,'bot'); setStatus(''); }
+      catch(e){ if(loader) loader.remove(); addMessage('❌ تعذّر الاتصال. تأكد من رابط الويب هوك والصلاحيات.','bot'); setStatus(String(e.message||e)); console.error(e); }
     }
-
     btn.addEventListener('click', send);
     form.addEventListener('submit', function(e){ e.preventDefault(); send(); });
   }
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
-  else wire();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire); else wire();
 })();
